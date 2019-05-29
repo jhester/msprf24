@@ -834,7 +834,7 @@ uint16_t spi_transfer9(uint16_t inw)
 #endif
 #endif
 
-#if defined(__MSP430_HAS_EUSCI_B0__) && (defined(SPI_DRIVER_USCI_B) || defined(SPI_DRIVER_USCI_B0))
+#if defined(__MSP430_HAS_EUSCI_B0__) && (defined(SPI_DRIVER_USCI_B) || defined(SPI_DRIVER_USCI_B0)) && !defined(__MSP430FR5994__)
 void spi_init()
 {
 	/* Configure ports on MSP430 device for USCI_B0 */
@@ -1006,8 +1006,8 @@ uint16_t spi_transfer9(uint16_t inw)
 void spi_init()
 {
 	/* Configure ports on MSP430FR5994 device for USCI_B1 */
-	P5SEL0 |= (BIT1 | BIT2 | BIT3);
-	P5SEL1 &= ~(BIT1 | BIT2 | BIT3);
+	P5SEL0 |= (BIT0 | BIT2 | BIT2);
+	P5SEL1 &= ~(BIT0 | BIT1 | BIT2);
 
 	/* USCI_B specific SPI setup */
 	UCB1CTLW0 |= UCSWRST;
