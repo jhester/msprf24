@@ -9,6 +9,9 @@
  * 5. USCI_B F5xxx - developed on MSP430F5172, added F5529
  *
  * Copyright (c) 2013, Eric Brundick <spirilis@linux.com>
+ * 
+ * Updated by Josiah Hester <josiah@northwestern.edu>
+ * 1. eUSCI_B - for MSP430FR5994 Launchpad, UCB1 SPI on P5.x
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose
  * with or without fee is hereby granted, provided that the above copyright notice
@@ -996,4 +999,44 @@ uint16_t spi_transfer9(uint16_t inw)
 #endif
 
 
+#endif
+
+// For the MSP430FR5994 launchpad
+#if defined(__MSP430FR5994__)
+void spi_init()
+{
+	/* Configure ports on MSP430FR5994 device for USCI_B1 */
+	P5SEL0 |= (BIT1 | BIT2 | BIT3);
+	P5SEL1 &= ~(BIT1 | BIT2 | BIT3);
+
+	/* USCI_B specific SPI setup */
+	UCB1CTLW0 |= UCSWRST;
+	UCB1CTLW0 = UCCKPH | UCMST | UCMSB | UCSYNC | UCSSEL_2 | UCSWRST;
+	UCB1BRW = 0x01;
+	UCB1CTLW0 &= ~UCSWRST;
+}
+
+uint8_t spi_transfer(uint8_t inb)
+{
+	UCB1TXBUF = inb;
+	while ( !(UCB1IFG & UCRXIFG) )  // Wait for RXIFG indicating remote byte received via SOMI
+		;
+	return UCB1RXBUF;
+}
+
+uint16_t spi_transfer16(uint16_t inw)
+{
+	uint16_t retw;
+	uint8_t *retw8 = (uint8_t *)&retw, *inw8 = (uint8_t *)&inw;
+
+	UCB1TXBUF = inw8[1];
+	while ( !(UCB1IFG & UCRXIFG) )
+		;
+	retw8[1] = UCB1RXBUF;
+	UCB1TXBUF = inw8[0];
+	while ( !(UCB1IFG & UCRXIFG) )
+		;
+	retw8[0] = UCB1RXBUF;
+	return retw;
+}
 #endif
