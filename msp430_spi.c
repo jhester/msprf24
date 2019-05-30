@@ -1006,7 +1006,7 @@ uint16_t spi_transfer9(uint16_t inw)
 void spi_init()
 {
 	/* Configure ports on MSP430FR5994 device for USCI_B1 */
-	P5SEL0 |= (BIT0 | BIT2 | BIT2);
+	P5SEL0 |= (BIT0 | BIT1 | BIT2);
 	P5SEL1 &= ~(BIT0 | BIT1 | BIT2);
 
 	/* USCI_B specific SPI setup */
